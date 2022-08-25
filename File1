@@ -1,0 +1,83 @@
+# docker
+
+# Docker
+
+## Installation Process of docker on a new Centos/RedHat Linux Machines
+
+By default only `root` user can run the commands and as we are using centos user by default so we want `docker` commands to be executed as centos user.
+For that we need a group and add `centos` user to that group.
+
+Containers are not created to run your STATEFULL WORKLOADS
+
+```
+$ sudo groupadd docker
+$ sudo usermod -a -G docker centos
+
+```
+
+After that logout and login once again.
+
+```
+$ sudo yum install docker -y 
+$ sudo systemctl enable docker 
+$ sudo systemctl start docker
+```
+
+Run the following command to ensure docker is running and you have permission to execute it.
+
+```
+$ docker version
+```
+This should show both the Docker Client and the Server which means that you've complete access on the repository.
+
+### How to supply env variables during the run time of the container
+
+```
+docker run -d -e MARIADB_ROOT_PASSWORD=password mariadb
+```
+
+
+### Volume Mapping 
+```
+Docker cannot persist the state, which means when you stop / start /destroy, the data on it won't be persisted.
+So to persist the data, we do something called as volume mapping
+```
+
+## Ensure you use the 8.7.1 version of sonarqube as the latest sonarQube has 11 & 17 of openJDK which create incompatibility issues to our project
+```
+docker run -d  -p 9000:9000 -v /home/centos/sonardata:/opt/sonarqube/data sonarqube:8.7.1-community
+```
+
+
+
+### To Start a Mariadb container :
+```
+$ docker run -d -p 3306:3306 -e MARIADB_ROOT_PASSWORD=student1 mariadb
+
+$ docker run -d -p 3306:3306  -v /home/centos/mariadb:/var/lib/mysql -e MARIADB_ROOT_PASSWORD=student1 mariadb
+ 
+ * This ensures data will be persisted
+
+```
+
+### This is how you connect to the DB Server :
+
+```
+ $ docker exec -it 2ec77eba7ad8 bash
+
+ root@2ec77eba7ad8:/# mysql -uroot -pstudent1
+        Welcome to the MariaDB monitor.  Commands end with ; or \g.
+        Your MariaDB connection id is 4
+        Server version: 10.7.3-MariaDB-1:10.7.3+maria~focal mariadb.org binary distribution
+
+        Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+        Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+        MariaDB [(none)]> 
+
+
+```
+### SonarQube Version to use :
+ docker run -d -v /home/centos/sonar:/opt/sonarqube/data -p 9000:9000 sonarqube:8.7.1-community
+
